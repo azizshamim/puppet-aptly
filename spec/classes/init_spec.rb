@@ -54,9 +54,9 @@ describe 'aptly' do
   end
 
   describe '#config' do
-    context 'not a hash' do
+    context 'not a hash or a string' do
       let(:params) {{
-        :config => 'this is a string',
+        :config => ['an','array'],
       }}
 
       it { expect { should }.to raise_error(Puppet::Error, /is not a Hash/) }
