@@ -20,14 +20,15 @@ describe 'aptly::repo' do
     }
   end
 
-  describe 'user defined component' do
+  describe 'user defined component and distribution' do
     let(:params){{
       :component => 'third-party',
+      :distribution => 'fuduntu',
     }}
 
     it {
         should contain_exec('aptly_repo_create-example').with({
-          :command  => /aptly repo create -component="third-party" example$/,
+          :command  => /aptly repo create -distribution="fuduntu" -component="third-party" example$/,
           :unless   => /aptly repo show example >\/dev\/null$/,
           :user     => 'root',
           :require  => [

@@ -12,8 +12,10 @@
 #
 define aptly::repo(
   $component = '',
+  $distribution = '',
 ){
   validate_string($component)
+  validate_string($distribution)
 
   include aptly
 
@@ -25,9 +27,14 @@ define aptly::repo(
     $component_arg = "-component=\"${component}\""
   }
 
+  if empty($distribution) {
+    $distribution_arg = ''
+  } else {
+    $distribution_arg = "-distribution=\"${distribution}\" "
+  }
 
   exec{ "aptly_repo_create-${title}":
-    command => "${aptly_cmd} create ${component_arg} ${title}",
+    command => "${aptly_cmd} create ${distribution_arg}${component_arg} ${title}",
     unless  => "${aptly_cmd} show ${title} >/dev/null",
     user    => $::aptly::user,
     require => [
