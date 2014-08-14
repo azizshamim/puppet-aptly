@@ -69,7 +69,7 @@ define aptly::mirror (
       }
     } else {
       exec {$exec_key_title:
-        command => "echo ${key_content} | ${gpg_cmd} --import -",
+        command => "echo '${key_content}' | ${gpg_cmd} --import -",
         unless  => "${gpg_cmd} --list-keys '${key}'",
         user    => $::aptly::user,
       }
