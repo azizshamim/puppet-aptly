@@ -23,6 +23,10 @@
 #   The keyserver to use when download the key
 #   Default: 'keyserver.ubuntu.com'
 #
+# [*key_content*]
+#   If a keyserver isn't available, use this instead to use the contents
+#   of a gpg file
+#
 # [*release*]
 #   Distribution to mirror for.
 #   Default: `$::lsbdistcodename`
@@ -36,6 +40,7 @@ define aptly::mirror (
   $location,
   $key,
   $keyserver = 'keyserver.ubuntu.com',
+  $key_content = '',
   $release = $::lsbdistcodename,
   $repos = [],
 ) {
@@ -56,10 +61,18 @@ define aptly::mirror (
   }
 
   if !defined(Exec[$exec_key_title]) {
-    exec { $exec_key_title:
-      command => "${gpg_cmd} --keyserver '${keyserver}' --recv-keys '${key}'",
-      unless  => "${gpg_cmd} --list-keys '${key}'",
-      user    => $::aptly::user,
+    if empty($key_content) {
+      exec { $exec_key_title:
+        command => "${gpg_cmd} --keyserver '${keyserver}' --recv-keys '${key}'",
+        unless  => "${gpg_cmd} --list-keys '${key}'",
+        user    => $::aptly::user,
+      }
+    } else {
+      exec {$exec_key_title:
+        command => "echo ${key_content} | ${gpg_cmd} --import -",
+        unless  => "${gpg_cmd} --list-keys '${key}'",
+        user    => $::aptly::user,
+      }
     }
   }
 
