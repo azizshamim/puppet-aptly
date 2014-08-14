@@ -82,7 +82,7 @@ describe 'aptly::mirror' do
     end
   end
 
-  describe '#keyserver' do
+  describe '#key' do
     context 'with custom keyserver' do
       let(:params){{
         :location   => 'http://repo.example.com',
@@ -98,7 +98,24 @@ describe 'aptly::mirror' do
         })
       }
     end
+
+    context 'with key content' do
+      let(:params){{
+        :location    => 'http://repo.example.com',
+        :key         => 'ABC123',
+        :key_content => 'ABCDEFGHIJKLMNOPQ',
+      }}
+
+      it{
+        should contain_exec('aptly_mirror_key-ABC123').with({
+          :command => / echo 'ABCDEFGHIJKLMNOPQ' | \/usr\/bin\/gpg --no-default-keyring --keyring trustedkeys.gpg --import -$/,
+          :unless  => / --list-keys 'ABC123'$/,
+          :user    => 'root',
+        })
+      }
+    end
   end
+
 
   describe '#repos' do
     context 'not an array' do
