@@ -36,6 +36,10 @@
 #   mirroring all components.
 #   Default: []
 #
+# [*with_sources*]
+#   Mirror the sources with the -with-sources flag
+#   Default: false
+#
 define aptly::mirror (
   $location,
   $key,
@@ -43,15 +47,25 @@ define aptly::mirror (
   $key_content = '',
   $release = $::lsbdistcodename,
   $repos = [],
+  $sources = false,
 ) {
+
   validate_string($keyserver)
   validate_array($repos)
+  validate_boolean($sources)
+  validate_string($key_content)
 
   include aptly
 
   $gpg_cmd = '/usr/bin/gpg --no-default-keyring --keyring trustedkeys.gpg'
   $aptly_cmd = '/usr/bin/aptly mirror'
   $exec_key_title = "aptly_mirror_key-${key}"
+
+  if $sources {
+    $sources_arg = ' -with-sources'
+  } else {
+    $sources_arg = ''
+  }
 
   if empty($repos) {
     $components_arg = ''
@@ -77,7 +91,7 @@ define aptly::mirror (
   }
 
   exec { "aptly_mirror_create-${title}":
-    command => "${aptly_cmd} create ${title} ${location} ${release}${components_arg}",
+    command => "${aptly_cmd} create ${title} ${location} ${release}${components_arg}${sources_arg}",
     unless  => "${aptly_cmd} show ${title} >/dev/null",
     user    => $::aptly::user,
     require => [
