@@ -116,6 +116,22 @@ describe 'aptly::mirror' do
     end
   end
 
+  describe '#sources' do
+    context 'with' do
+      let(:params) {{
+        :location => 'http://repo.example.com',
+        :key      => 'ABC123',
+        :sources  => true,
+      }}
+
+      it{
+        should contain_exec('aptly_mirror_create-example').with_command(
+          /-with-sources$/
+        )
+      }
+    end
+  end
+
 
   describe '#repos' do
     context 'not an array' do

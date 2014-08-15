@@ -36,7 +36,7 @@
 #   mirroring all components.
 #   Default: []
 #
-# [*with_sources*]
+# [*sources*]
 #   Mirror the sources with the -with-sources flag
 #   Default: false
 #
@@ -52,7 +52,7 @@ define aptly::mirror (
 
   validate_string($keyserver)
   validate_array($repos)
-  validate_boolean($sources)
+  validate_bool($sources)
   validate_string($key_content)
 
   include aptly
